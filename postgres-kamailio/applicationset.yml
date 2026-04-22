@@ -27,13 +27,13 @@ spec:
         helm:
           parameters:
             - name: postgres_user
-              value: "{{postgres_user}}"
+              value: "{{env_vars.postgres_user}}"
 
             - name: postgres_password
-              value: "{{postgres_password}}"
+              value: "{{env_vars.postgres_password}}"
 
             - name: postgres_db
-              value: "{{postgres_db}}"
+              value: "{{env_vars.postgres_db}}"
 
       destination:
         name: in-cluster
