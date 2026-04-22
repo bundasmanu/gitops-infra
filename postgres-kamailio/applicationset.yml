@@ -1,17 +1,16 @@
----
-
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: postgres-kamailio
   namespace: argocd
+
 spec:
   generators:
     - git:
         repoURL: https://github.com/bundasmanu/gitops-infra
         revision: main
-        directories:
-          - path: postgres-kamailio/*/*
+        files:
+          - path: postgres-kamailio/*.yml
 
   template:
     metadata:
@@ -24,15 +23,21 @@ spec:
         repoURL: https://github.com/bundasmanu/postgres-kamailio-docker
         targetRevision: main
         path: helm/kamailio-db
+
         helm:
-          valueFiles:
-            - values.yaml
-            - ../../gitops-infra/postgres-kamailio/base/values.yaml
-            - ../../gitops-infra/postgres-kamailio/{{path[1]}}/{{path[2]}}.yaml
+          parameters:
+            - name: postgres_user
+              value: "{{postgres_user}}"
+
+            - name: postgres_password
+              value: "{{postgres_password}}"
+
+            - name: postgres_db
+              value: "{{postgres_db}}"
 
       destination:
         name: in-cluster
-        namespace: "{{namespace}}"
+        namespace: kamailio
 
       syncPolicy:
         automated:
