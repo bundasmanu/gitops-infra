@@ -26,13 +26,13 @@ spec:
 
         helm:
           parameters:
-            - name: postgres_user
+            - name: env_vars.postgres_user
               value: "{{env_vars.postgres_user}}"
 
-            - name: postgres_password
+            - name: env_vars.postgres_password
               value: "{{env_vars.postgres_password}}"
 
-            - name: postgres_db
+            - name: env_vars.postgres_db
               value: "{{env_vars.postgres_db}}"
 
       destination:
