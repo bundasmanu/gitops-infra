@@ -1,0 +1,10 @@
+---
+
+name: dev-01
+cluster: docker-desktop
+namespace: kamailio-db
+
+env_vars:
+  postgres_user: postgres
+  postgres_password: xpto
+  postgres_db: kamailio
