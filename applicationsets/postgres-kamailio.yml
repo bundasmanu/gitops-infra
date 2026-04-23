@@ -1,0 +1,59 @@
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: postgres-kamailio
+  namespace: argocd
+
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+
+  generators:
+    - matrix:
+        generators:
+
+          # 1. Apps
+          - git:
+              repoURL: https://github.com/bundasmanu/gitops-infra
+              revision: main
+              files:
+                - path: apps/postgres-kamailio.yml
+
+          # 2. Environments (optional overrides via env_overrides)
+          - git:
+              repoURL: https://github.com/bundasmanu/gitops-infra
+              revision: main
+              files:
+                - path: environments/*.yml
+
+  template:
+    metadata:
+      name: "{{.name}}-{{.cluster}}"
+
+    spec:
+      project: default
+
+      source:
+        repoURL: "{{.repoURL}}"
+        targetRevision: main
+        path: "{{.path}}"
+
+        helm:
+          values: |
+            {{- $base := default (dict) (get . "env_vars") }}
+            {{- $overrides := default (dict) (get . "env_overrides") }}
+            {{- $merged := merge (deepCopy $base) $overrides }}
+            {{- printf "env_vars:\n%s" (toYaml $merged | nindent 2) }}
+
+      destination:
+        name: '{{ index . "name-dest" }}'
+        namespace: "{{.namespace}}"
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

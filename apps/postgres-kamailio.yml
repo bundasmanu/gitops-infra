@@ -1,0 +1,12 @@
+---
+
+name: postgres-kamailio
+repoURL: https://github.com/bundasmanu/postgres-kamailio-docker
+path: helm/kamailio-db
+
+env_vars:
+  postgres_user: postgres
+  postgres_password: xpto
+  postgres_db: kamailio
+
+namespace: kamailio
