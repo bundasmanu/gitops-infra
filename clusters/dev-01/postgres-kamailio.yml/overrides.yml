@@ -5,3 +5,8 @@ env: dev-01
 
 name-dest: in-cluster
 cluster: docker-desktop
+
+#env_overrides:
+#  postgres_user: postgres
+#  postgres_password: xpto
+#  postgres_db: kamailio
