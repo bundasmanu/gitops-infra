@@ -1,8 +1,0 @@
----
-
-name-dest: in-cluster
-cluster: docker-desktop
-
-# Optional: keys here override the same keys in apps/postgres-kamailio.yml env_vars.
-env_overrides:
-  postgres_db: kamailio

@@ -30,7 +30,7 @@ spec:
 
   template:
     metadata:
-      name: "{{.name}}-{{.cluster}}"
+      name: "{{.name}}-{{.env}}"
 
     spec:
       project: default

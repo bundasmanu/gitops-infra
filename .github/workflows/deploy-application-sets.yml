@@ -1,0 +1,78 @@
+---
+
+# Self-hosted runner: Linux or macOS. Argo CD must already exist.
+
+name: Deploy ApplicationSets
+
+on:
+  workflow_dispatch:
+    inputs:
+      cluster:
+        required: true
+        default: dev-01
+        type: string
+
+      applicationset:
+        required: false
+        default: all
+        type: string
+
+      kubectl_context:
+        description: kubectl context (empty = current)
+        required: false
+        default: "docker-desktop"
+        type: string
+
+jobs:
+  deploy:
+    runs-on:
+      - self-hosted
+
+    permissions:
+      contents: read
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: kubectl context
+        env:
+          CTX: ${{ inputs.kubectl_context }}
+        run: |
+          command -v kubectl >/dev/null || exit 1
+          if [ -n "${CTX}" ]; then kubectl config use-context "${CTX}"; fi
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: v1.31.0
+
+      - name: ApplicationSets
+        env:
+          CLUSTER: ${{ inputs.cluster }}
+          FILTER: ${{ inputs.applicationset }}
+        run: |
+          kubectl kustomize --help >/dev/null
+          ROOT="clusters/${CLUSTER}"
+          test -d "${ROOT}"
+          found=0
+          for candidate in "${ROOT}"/*; do
+            [ -d "${candidate}" ] || continue
+            base="$(basename "${candidate}")"
+            if [ "${FILTER}" != "all" ]; then
+              stripped="${base%.yml}"
+              if [ "${stripped}" != "${FILTER}" ] && [ "${base}" != "${FILTER}" ]; then
+                continue
+              fi
+            fi
+            if [ ! -f "${candidate}/kustomization.yml" ] && [ ! -f "${candidate}/kustomization.yaml" ]; then
+              continue
+            fi
+            kubectl kustomize "${candidate}" | kubectl apply -f -
+            found=$((found + 1))
+          done
+          test "${found}" -gt 0

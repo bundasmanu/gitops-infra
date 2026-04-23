@@ -1,0 +1,7 @@
+---
+
+# Must match environments/active-env.yml for this row to be selected.
+env: dev-01
+
+name-dest: in-cluster
+cluster: docker-desktop

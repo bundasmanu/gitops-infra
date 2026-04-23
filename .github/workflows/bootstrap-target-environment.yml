@@ -1,0 +1,90 @@
+---
+
+# Self-hosted runner: Linux or macOS (Docker Desktop / Colima / k3s, etc.).
+# Requires kubectl pointing at your cluster (~/.kube/config or runner env).
+
+name: Install Argo CD and ApplicationSets
+
+on:
+  workflow_dispatch:
+    inputs:
+      cluster:
+        description: Folder under clusters/ (e.g. dev-01)
+        required: true
+        default: dev-01
+        type: string
+
+      applicationset:
+        description: Overlay folder name or all
+        required: false
+        default: all
+        type: string
+
+      kubectl_context:
+        description: kubectl context name (leave default empty to use current context)
+        required: false
+        default: ""
+        type: string
+
+jobs:
+  install:
+    runs-on:
+      - self-hosted
+
+    permissions:
+      contents: read
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: kubectl context
+        env:
+          CTX: ${{ inputs.kubectl_context }}
+        run: |
+          command -v kubectl >/dev/null || { echo "kubectl not found" >&2; exit 1; }
+          if [ -n "${CTX}" ]; then kubectl config use-context "${CTX}"; fi
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: v1.31.0
+
+      - name: Argo CD
+        run: |
+          if kubectl get deployment argocd-server -n argocd >/dev/null 2>&1; then
+            echo "Argo CD already installed."
+            exit 0
+          fi
+          kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+      - name: ApplicationSets
+        env:
+          CLUSTER: ${{ inputs.cluster }}
+          FILTER: ${{ inputs.applicationset }}
+        run: |
+          kubectl kustomize --help >/dev/null
+          ROOT="clusters/${CLUSTER}"
+          test -d "${ROOT}"
+          found=0
+          for candidate in "${ROOT}"/*; do
+            [ -d "${candidate}" ] || continue
+            base="$(basename "${candidate}")"
+            if [ "${FILTER}" != "all" ]; then
+              stripped="${base%.yml}"
+              if [ "${stripped}" != "${FILTER}" ] && [ "${base}" != "${FILTER}" ]; then
+                continue
+              fi
+            fi
+            if [ ! -f "${candidate}/kustomization.yml" ] && [ ! -f "${candidate}/kustomization.yaml" ]; then
+              continue
+            fi
+            kubectl kustomize "${candidate}" | kubectl apply -f -
+            found=$((found + 1))
+          done
+          test "${found}" -gt 0
