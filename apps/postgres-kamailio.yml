@@ -2,7 +2,7 @@
 
 name: postgres-kamailio
 repoURL: https://github.com/bundasmanu/postgres-kamailio-docker
-path: helm/kamailio-db
+chartPath: helm/kamailio-db
 
 env_vars:
   postgres_user: postgres

@@ -38,7 +38,7 @@ spec:
       source:
         repoURL: "{{.repoURL}}"
         targetRevision: main
-        path: "{{.path}}"
+        path: "{{.chartPath}}"
 
         helm:
           values: |
