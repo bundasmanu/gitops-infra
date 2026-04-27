@@ -1,5 +1,8 @@
 ---
 
+# References applicationsets/ outside this folder; CI uses:
+# kubectl kustomize --load-restrictor LoadRestrictionsNone .
+
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
