@@ -1,0 +1,33 @@
+---
+
+name: webrtc-gateway
+repoURL: https://github.com/bundasmanu/kamailio-webrtc-gateway
+chartPath: k8s/helm/webrtc-gateway
+
+namespace: kamailio
+
+# Baseline Helm values (merged with chart_values_overrides in clusters/<cluster>/webrtc-gateway.yml/overrides.yml)
+chart_values:
+  replicaCount: 1
+
+  image:
+    repository: bundasmanu/webrtc-gateway
+    tag: latest
+    pullPolicy: Always
+
+  hostNetwork: true
+
+  secrets:
+    existingSecret: webrtc-gateway-secrets
+
+  tls:
+    mountPath: /etc/kamailio/certs
+    readOnly: true
+    existingSecret: kamailio-tls
+    secretCertKey: tls.crt
+    secretKeyKey: tls.key
+    secretDefaultMode: 420
+
+  volumeMounts:
+    - name: config
+      mountPath: /tmp/config

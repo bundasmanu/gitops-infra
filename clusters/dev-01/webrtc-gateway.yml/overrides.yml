@@ -1,0 +1,40 @@
+---
+
+# Must match environments/active-env.yml for this row to be selected.
+env: dev-01
+
+name-dest: in-cluster
+cluster: docker-desktop
+
+# Per-cluster Helm overrides (merged on top of apps/webrtc-gateway.yml chart_values)
+chart_values_overrides:
+  listens:
+    - '127.0.0.1:5060 name "lan-internal"'
+
+  aliases:
+    - "127.0.0.1"
+
+  sipsak_commands:
+    - "sipsak -s sip:127.0.0.1:5060 -H 127.0.0.1"
+
+  live_probe_ip: "127.0.0.1"
+
+  env:
+    CONFIGS_FOLDER: "/etc/kamailio"
+    CFGFILE: "router.cfg"
+    STARTER_KAM_USER: "kamailio"
+    STARTER_KAM_GROUP: "kamailio"
+    SHM_MEMORY: "2048"
+    PKG_MEMORY: "128"
+    RUNDIR: "/var/run/kamailio"
+
+    WITH_PROM_STATS: "true"
+    WITH_LOG_STDERR: "true"
+    WITH_MID_REGISTRAR_SUPPORT: "true"
+    ONLY_ONE_INTERNAL_SETID_DISPATCHER: "true"
+
+    DISPATCHER_DEFAULT_SOCKNAME: "lan-internal"
+
+    PROM_STATS_LISTEN: "tcp:127.0.0.1:8123"
+
+    WITH_TLS: "true"

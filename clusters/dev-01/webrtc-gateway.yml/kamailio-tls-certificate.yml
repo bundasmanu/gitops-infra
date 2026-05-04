@@ -1,0 +1,33 @@
+---
+
+# Requires cert-manager in the cluster. Produces Secret kamailio-tls (see apps chart_values / chart tls.existingSecret).
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: kamailio-tls-selfsigned
+  namespace: kamailio
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kamailio-tls
+  namespace: kamailio
+spec:
+  secretName: kamailio-tls
+  duration: 2160h
+  renewBefore: 360h
+  privateKey:
+    algorithm: RSA
+    size: 4096
+  subject:
+    organizations:
+      - webrtc-gateway-dev
+  commonName: webrtc-gateway.kamailio.svc.cluster.local
+  dnsNames:
+    - webrtc-gateway.kamailio.svc.cluster.local
+    - localhost
+  issuerRef:
+    name: kamailio-tls-selfsigned
+    kind: Issuer
