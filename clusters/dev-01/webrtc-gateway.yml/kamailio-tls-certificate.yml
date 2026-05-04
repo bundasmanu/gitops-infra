@@ -1,6 +1,6 @@
 ---
 
-# Requires cert-manager in the cluster. Produces Secret kamailio-tls (see apps chart_values / chart tls.existingSecret).
+# Requires cert-manager (install via bootstrap-target-environment workflow). Creates Secret kamailio-tls for chart tls.existingSecret.
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
@@ -12,7 +12,7 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: kamailio-tls
+  name: kamailio-gateway-tls
   namespace: kamailio
 spec:
   secretName: kamailio-tls

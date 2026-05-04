@@ -2,6 +2,7 @@
 
 # Self-hosted runner: Linux or macOS (Docker Desktop / Colima / k3s, etc.).
 # Requires kubectl pointing at your cluster (~/.kube/config or runner env).
+# Order: cert-manager (CRDs) -> Argo CD -> ApplicationSets.
 
 name: Install Argo CD and ApplicationSets
 
@@ -53,6 +54,19 @@ jobs:
         uses: azure/setup-kubectl@v4
         with:
           version: v1.31.0
+
+      - name: cert-manager
+        env:
+          CERT_MANAGER_VERSION: v1.20.2
+        run: |
+          set -euo pipefail
+          if kubectl get deployment cert-manager -n cert-manager >/dev/null 2>&1; then
+            echo "cert-manager already installed."
+            exit 0
+          fi
+          kubectl apply -f \
+            "https://github.com/cert-manager/cert-manager/releases/download/${CERT_MANAGER_VERSION}/cert-manager.yaml"
+          kubectl wait --for=condition=Available deployment --all -n cert-manager --timeout=300s
 
       - name: Argo CD
         run: |
