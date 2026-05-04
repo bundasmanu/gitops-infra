@@ -1,0 +1,10 @@
+---
+
+name: nginx-sip-edge
+repoURL: https://github.com/bundasmanu/gitops-infra
+chartPath: charts/nginx-sip-edge
+
+namespace: kamailio
+
+# Defaults (upstream, ports, nginx Service type) are in charts/nginx-sip-edge/values.yaml.
+# Per-cluster overrides: chart_values_overrides in clusters/<cluster>/nginx-sip-edge.yml/overrides.yml.

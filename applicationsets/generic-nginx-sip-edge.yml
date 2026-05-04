@@ -1,0 +1,57 @@
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: nginx-sip-edge
+  namespace: argocd
+
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+
+  generators:
+    - matrix:
+        generators:
+
+          - git:
+              repoURL: https://github.com/bundasmanu/gitops-infra
+              revision: main
+              files:
+                - path: apps/nginx-sip-edge.yml
+
+          - git:
+              repoURL: https://github.com/bundasmanu/gitops-infra
+              revision: main
+              files:
+                - path: environments/*.yml
+
+  template:
+    metadata:
+      name: "{{.name}}-{{.env}}"
+
+    spec:
+      project: default
+
+      source:
+        repoURL: "{{.repoURL}}"
+        targetRevision: main
+        path: "{{.chartPath}}"
+
+        helm:
+          values: |
+            {{- $base := default (dict) (get . "chart_values") }}
+            {{- $overrides := default (dict) (get . "chart_values_overrides") }}
+            {{- $merged := merge (deepCopy $base) $overrides }}
+            {{- toYaml $merged }}
+
+      destination:
+        name: '{{ index . "name-dest" }}'
+        namespace: "{{.namespace}}"
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

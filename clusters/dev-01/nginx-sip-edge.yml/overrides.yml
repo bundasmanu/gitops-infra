@@ -1,0 +1,11 @@
+---
+
+env: dev-01
+
+name-dest: in-cluster
+cluster: docker-desktop
+
+# Optional: only if your chart uses a different Service name than webrtc-gateway.
+# chart_values_overrides:
+#   upstream:
+#     host: other-name.kamailio.svc.cluster.local

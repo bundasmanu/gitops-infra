@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "nginx-sip-edge.fullname" . }}-config
+  labels:
+    app.kubernetes.io/name: {{ include "nginx-sip-edge.name" . }}
+data:
+  nginx.conf: |
+    worker_processes auto;
+    error_log /var/log/nginx/error.log info;
+    pid /tmp/nginx.pid;
+
+    events {
+      worker_connections 1024;
+    }
+
+    stream {
+      upstream kamailio_sip {
+        server {{ .Values.upstream.host }}:{{ .Values.upstream.sipPort }};
+      }
+
+      upstream kamailio_tls {
+        server {{ .Values.upstream.host }}:{{ .Values.upstream.tlsPort }};
+      }
+
+      server {
+        listen {{ .Values.upstream.sipPort }} udp;
+        proxy_pass kamailio_sip;
+        proxy_timeout 10s;
+      }
+
+      server {
+        listen {{ .Values.upstream.sipPort }};
+        proxy_pass kamailio_sip;
+        proxy_timeout 10s;
+      }
+
+      server {
+        listen {{ .Values.upstream.tlsPort }};
+        proxy_pass kamailio_tls;
+        proxy_timeout 10s;
+      }
+    }

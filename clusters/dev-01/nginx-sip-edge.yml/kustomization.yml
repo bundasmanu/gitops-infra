@@ -1,0 +1,17 @@
+---
+
+# Registers nginx-sip-edge ApplicationSet; CI applies via deploy-application-sets / bootstrap.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../../applicationsets/generic-nginx-sip-edge.yml
+
+patches:
+  - target:
+      kind: ApplicationSet
+      name: nginx-sip-edge
+    patch: |-
+      - op: replace
+        path: /spec/generators/0/matrix/generators/1/git/files/0/path
+        value: clusters/dev-01/nginx-sip-edge.yml/overrides.yml

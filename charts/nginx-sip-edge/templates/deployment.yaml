@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "nginx-sip-edge.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "nginx-sip-edge.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nginx-sip-edge.name" . }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nginx-sip-edge.name" . }}
+    spec:
+      containers:
+        - name: nginx
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: sip-udp
+              containerPort: {{ .Values.upstream.sipPort }}
+              protocol: UDP
+            - name: sip-tcp
+              containerPort: {{ .Values.upstream.sipPort }}
+              protocol: TCP
+            - name: sip-tls
+              containerPort: {{ .Values.upstream.tlsPort }}
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+          readinessProbe:
+            tcpSocket:
+              port: sip-tcp
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: sip-tcp
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "nginx-sip-edge.fullname" . }}-config

@@ -1,0 +1,27 @@
+---
+
+# Kamailio Headless/Cluster Service in the webrtc-gateway chart; nginx stream proxies to this DNS (all replicas).
+upstream:
+  host: webrtc-gateway.kamailio.svc.cluster.local
+  sipPort: 5060
+  tlsPort: 5061
+
+replicaCount: 1
+
+image:
+  repository: nginx
+  tag: "1.27-alpine"
+  pullPolicy: IfNotPresent
+
+service:
+  type: LoadBalancer
+  annotations: {}
+  # external-dns.alpha.kubernetes.io/hostname: sip.example.com
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi

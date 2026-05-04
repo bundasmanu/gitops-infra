@@ -9,15 +9,15 @@ cluster: docker-desktop
 # Per-cluster Helm overrides (merged on top of apps/webrtc-gateway.yml chart_values)
 chart_values_overrides:
   listens:
-    - '127.0.0.1:5060 name "lan-internal"'
+    - '0.0.0.0:5060 name "lan-internal"'
 
   aliases:
-    - "127.0.0.1"
+    - "0.0.0.0"
 
   sipsak_commands:
-    - "sipsak -s sip:127.0.0.1:5060 -H 127.0.0.1"
+    - "sipsak -s sip:0.0.0.0:5060 -H 0.0.0.0"
 
-  live_probe_ip: "127.0.0.1"
+  live_probe_ip: "0.0.0.0"
 
   env:
     CONFIGS_FOLDER: "/etc/kamailio"
@@ -35,6 +35,6 @@ chart_values_overrides:
 
     DISPATCHER_DEFAULT_SOCKNAME: "lan-internal"
 
-    PROM_STATS_LISTEN: "tcp:127.0.0.1:8123"
+    PROM_STATS_LISTEN: "tcp:0.0.0.0:8123"
 
     WITH_TLS: "true"

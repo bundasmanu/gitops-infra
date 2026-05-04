@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "nginx-sip-edge.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "nginx-sip-edge.name" . }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app.kubernetes.io/name: {{ include "nginx-sip-edge.name" . }}
+  ports:
+    - name: sip-udp
+      port: {{ .Values.upstream.sipPort }}
+      protocol: UDP
+      targetPort: sip-udp
+    - name: sip-tcp
+      port: {{ .Values.upstream.sipPort }}
+      protocol: TCP
+      targetPort: sip-tcp
+    - name: sip-tls
+      port: {{ .Values.upstream.tlsPort }}
+      protocol: TCP
+      targetPort: sip-tls
