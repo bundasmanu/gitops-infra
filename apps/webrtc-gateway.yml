@@ -8,7 +8,7 @@ namespace: kamailio
 
 # Baseline Helm values (merged with chart_values_overrides in clusters/<cluster>/webrtc-gateway.yml/overrides.yml)
 chart_values:
-  replicaCount: 1
+  replicaCount: 2
 
   image:
     repository: bundasmanu/webrtc-gateway
