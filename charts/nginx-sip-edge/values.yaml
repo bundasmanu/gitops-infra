@@ -31,10 +31,11 @@ resources:
 # HTTPS + WebSocket (browser wss://) — TLS on nginx edge; upstream is Kamailio WebSocket.
 # SIP stream on 5060/5061 stays in stream {} (passthrough).
 # When upstream.https is true, proxy_pass uses https:// (e.g. WebSocket over TLS on tlsPort — no separate :8080 HTTP).
+# WSS is on by default; override serverName + tls.existingSecret per env (Secret must exist before pod starts).
 wss:
-  enabled: false
-  # nginx server_name; use space-separated hosts for DNS + localhost (must match TLS cert SANs).
-  serverName: ""
+  enabled: true
+  # Must match TLS cert SANs; add public hostnames in cluster overrides (e.g. "sip-edge.com localhost").
+  serverName: localhost
   # Path Kamailio serves WebSocket on (e.g. /ws); default / forwards the full URI.
   path: /
   proxyReadTimeout: 86400s
@@ -51,7 +52,7 @@ wss:
     sslVerify: "off"
   tls:
     # TLS cert presented to browsers for wss:// — separate from SIP TLS on Kamailio.
-    existingSecret: ""
+    existingSecret: nginx-wss-tls
     mountPath: /etc/nginx/wss-tls
     certFile: tls.crt
     keyFile: tls.key
