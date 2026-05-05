@@ -1,5 +1,10 @@
 {{- $wssHost := .Values.wss.upstream.host | default .Values.upstream.host }}
 {{- $wssPort := .Values.wss.upstream.port }}
+{{- $wssUpstreamHttps := true }}
+{{- if hasKey .Values.wss.upstream "https" }}
+{{- $wssUpstreamHttps = .Values.wss.upstream.https }}
+{{- end }}
+{{- $wssSslName := .Values.wss.upstream.sslServerName | default $wssHost }}
 {{- if .Values.wss.enabled }}
 {{- $_ := required "wss.serverName is required when wss.enabled" .Values.wss.serverName }}
 {{- $_ := required "wss.tls.existingSecret is required when wss.enabled" .Values.wss.tls.existingSecret }}
@@ -38,7 +43,15 @@ data:
             ssl_certificate_key {{ .Values.wss.tls.mountPath }}/{{ .Values.wss.tls.keyFile }};
             ssl_protocols TLSv1.2 TLSv1.3;
             location {{ .Values.wss.path }} {
+                {{- if $wssUpstreamHttps }}
+                proxy_pass https://kamailio_wss;
+                proxy_ssl_protocols TLSv1.2 TLSv1.3;
+                proxy_ssl_server_name on;
+                proxy_ssl_name {{ $wssSslName }};
+                proxy_ssl_verify {{ .Values.wss.upstream.sslVerify }};
+                {{- else }}
                 proxy_pass http://kamailio_wss;
+                {{- end }}
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade $http_upgrade;
                 proxy_set_header Connection $connection_upgrade;

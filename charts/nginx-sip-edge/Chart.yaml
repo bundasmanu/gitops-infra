@@ -4,5 +4,5 @@ apiVersion: v2
 name: nginx-sip-edge
 description: L4 SIP stream proxy + optional HTTPS/WSS (server_name) to Kamailio websocket
 type: application
-version: 0.2.0
+version: 0.3.0
 appVersion: "1.27"

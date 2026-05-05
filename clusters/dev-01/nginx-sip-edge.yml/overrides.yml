@@ -6,27 +6,29 @@ name-dest: in-cluster
 cluster: docker-desktop
 
 # WSS on 443: nginx terminates TLS (Secret nginx-wss-tls), proxies WebSocket to Kamailio.
-# Align wss.upstream.port with Kamailio xhttp/websocket listen (chart default 8080).
-# JsSIP example: wss://localhost/ — path must match Kamailio + wss.path below.
+# wss.serverName: space-separated hostnames for nginx server_name — must align with TLS SANs.
+# JsSIP: wss://sip-edge.com/ ... (production) or wss://localhost/ (local).
+# Upstream: HTTPS to Kamailio on 5061 only (no HTTP/8080). Kamailio must serve WebSocket over TLS there.
 #
-# Public DNS: A/AAAA hostname → LB IP; add hostname to nginx-wss-tls-certificate.yml
-# dnsNames and set wss.serverName to match; optional external-dns:
-#   service.annotations.external-dns.alpha.kubernetes.io/hostname: <hostname>
+# Cloudflare: A record sip-edge.com → WAN IP. Grey-cloud (DNS only) until origin TLS is trusted;
+# orange-cloud Full (strict) needs a valid cert on nginx (e.g. LetsEncrypt).
 
 chart_values_overrides:
   wss:
     enabled: true
-    serverName: localhost
+    serverName: "sip-edge.com localhost"
     path: /
     upstream:
-      port: 8080
+      port: 5061
+      https: true
     tls:
       existingSecret: nginx-wss-tls
 
-# Optional: external-dns when LB has a routable IP (merge under chart_values_overrides.service).
+# Optional: external-dns when LB has a routable IP.
+# chart_values_overrides:
 #   service:
 #     annotations:
-#       external-dns.alpha.kubernetes.io/hostname: signal.example.com
+#       external-dns.alpha.kubernetes.io/hostname: sip-edge.com
 
 # Optional: different Kamailio Service DNS.
 # chart_values_overrides:
