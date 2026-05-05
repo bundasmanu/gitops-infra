@@ -28,6 +28,9 @@ spec:
 
   template:
     metadata:
+      # Unique inside this Argo CD (argocd namespace). Destination cluster differs per env,
+      # but Application names cannot repeat. Workloads still use plain name nginx-sip-edge via
+      # chart fullnameOverride in apps/nginx-sip-edge.yml.
       name: "{{.name}}-{{.env}}"
 
     spec:

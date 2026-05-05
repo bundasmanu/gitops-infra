@@ -28,11 +28,21 @@ spec:
             - name: sip-tls
               containerPort: {{ .Values.upstream.tlsPort }}
               protocol: TCP
+          {{- if .Values.wss.enabled }}
+            - name: wss
+              containerPort: 443
+              protocol: TCP
+          {{- end }}
           volumeMounts:
             - name: config
               mountPath: /etc/nginx/nginx.conf
               subPath: nginx.conf
               readOnly: true
+          {{- if .Values.wss.enabled }}
+            - name: wss-tls
+              mountPath: {{ .Values.wss.tls.mountPath }}
+              readOnly: true
+          {{- end }}
           readinessProbe:
             tcpSocket:
               port: sip-tcp
@@ -49,3 +59,8 @@ spec:
         - name: config
           configMap:
             name: {{ include "nginx-sip-edge.fullname" . }}-config
+        {{- if .Values.wss.enabled }}
+        - name: wss-tls
+          secret:
+            secretName: {{ .Values.wss.tls.existingSecret }}
+        {{- end }}

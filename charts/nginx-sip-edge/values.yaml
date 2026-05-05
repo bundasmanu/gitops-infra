@@ -15,8 +15,10 @@ image:
 
 service:
   type: LoadBalancer
+  # Optional: public DNS for this LoadBalancer (external-dns or manual A/AAAA → LB).
+  # With wss.enabled, the same Service also exposes 443 for HTTPS/WSS (server_name + TLS on nginx).
   annotations: {}
-  # external-dns.alpha.kubernetes.io/hostname: sip.example.com
+  # external-dns.alpha.kubernetes.io/hostname: sip.edge.example.com
 
 resources:
   requests:
@@ -25,3 +27,23 @@ resources:
   limits:
     cpu: 500m
     memory: 256Mi
+
+# HTTPS + WebSocket (browser wss://) — terminates TLS on nginx, proxies HTTP/WebSocket to Kamailio.
+# SIP signaling on 5060/5061 stays in stream {} (passthrough) above.
+# Set Kamailio xhttp/websocket listen port to match wss.upstream.port (in-cluster, often plain HTTP).
+wss:
+  enabled: false
+  serverName: ""
+  # Path Kamailio serves WebSocket on (e.g. /ws); default / forwards the full URI.
+  path: /
+  proxyReadTimeout: 86400s
+  upstream:
+    # Leave empty to reuse upstream.host (Kamailio Service DNS).
+    host: ""
+    port: 8080
+  tls:
+    # TLS cert presented to browsers for wss:// — separate from SIP TLS on Kamailio.
+    existingSecret: ""
+    mountPath: /etc/nginx/wss-tls
+    certFile: tls.crt
+    keyFile: tls.key

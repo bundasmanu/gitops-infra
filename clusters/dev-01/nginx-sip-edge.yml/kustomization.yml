@@ -6,6 +6,7 @@ kind: Kustomization
 
 resources:
   - ../../../applicationsets/generic-nginx-sip-edge.yml
+  - nginx-wss-tls-certificate.yml
 
 patches:
   - target:

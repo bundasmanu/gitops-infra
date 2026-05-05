@@ -25,3 +25,9 @@ spec:
       port: {{ .Values.upstream.tlsPort }}
       protocol: TCP
       targetPort: sip-tls
+    {{- if .Values.wss.enabled }}
+    - name: wss
+      port: 443
+      protocol: TCP
+      targetPort: wss
+    {{- end }}

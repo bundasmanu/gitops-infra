@@ -1,0 +1,31 @@
+---
+
+# TLS for nginx WSS on 443 (browser-facing). Separate from kamailio-tls (SIP).
+# Requires cert-manager. SAN localhost suits Docker Desktop / local JsSIP (wss://localhost/...).
+# For production: add your public hostname to dnsNames, set wss.serverName in overrides
+# to match, and point DNS A/AAAA at the LoadBalancer (or external-dns on the Service).
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: nginx-wss-selfsigned
+  namespace: kamailio
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: nginx-wss-tls-cert
+  namespace: kamailio
+spec:
+  secretName: nginx-wss-tls
+  duration: 2160h
+  renewBefore: 360h
+  privateKey:
+    algorithm: RSA
+    size: 4096
+  dnsNames:
+    - localhost
+  issuerRef:
+    name: nginx-wss-selfsigned
+    kind: Issuer

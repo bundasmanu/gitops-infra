@@ -6,5 +6,10 @@ chartPath: charts/nginx-sip-edge
 
 namespace: kamailio
 
-# Defaults (upstream, ports, nginx Service type) are in charts/nginx-sip-edge/values.yaml.
-# Per-cluster overrides: chart_values_overrides in clusters/<cluster>/nginx-sip-edge.yml/overrides.yml.
+# In each target cluster Service/Deploy use resource name nginx-sip-edge (fullnameOverride),
+# regardless of Argo Application name nginx-sip-edge-<env> on this Argo CD.
+chart_values:
+  fullnameOverride: nginx-sip-edge
+
+# Other defaults (upstream, ports, service type): charts/nginx-sip-edge/values.yaml.
+# Per-cluster overrides: clusters/<cluster>/nginx-sip-edge.yml/overrides.yml.

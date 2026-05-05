@@ -5,7 +5,30 @@ env: dev-01
 name-dest: in-cluster
 cluster: docker-desktop
 
-# Optional: only if your chart uses a different Service name than webrtc-gateway.
+# WSS on 443: nginx terminates TLS (Secret nginx-wss-tls), proxies WebSocket to Kamailio.
+# Align wss.upstream.port with Kamailio xhttp/websocket listen (chart default 8080).
+# JsSIP example: wss://localhost/ — path must match Kamailio + wss.path below.
+#
+# Public DNS: A/AAAA hostname → LB IP; add hostname to nginx-wss-tls-certificate.yml
+# dnsNames and set wss.serverName to match; optional external-dns:
+#   service.annotations.external-dns.alpha.kubernetes.io/hostname: <hostname>
+
+chart_values_overrides:
+  wss:
+    enabled: true
+    serverName: localhost
+    path: /
+    upstream:
+      port: 8080
+    tls:
+      existingSecret: nginx-wss-tls
+
+# Optional: external-dns when LB has a routable IP (merge under chart_values_overrides.service).
+#   service:
+#     annotations:
+#       external-dns.alpha.kubernetes.io/hostname: signal.example.com
+
+# Optional: different Kamailio Service DNS.
 # chart_values_overrides:
 #   upstream:
 #     host: other-name.kamailio.svc.cluster.local
