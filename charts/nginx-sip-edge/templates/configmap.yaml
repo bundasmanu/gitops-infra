@@ -37,7 +37,7 @@ data:
             server {{ $wssHost }}:{{ $wssPort }};
         }
         server {
-            listen 443 ssl;
+            listen 443 ssl http2;
             server_name {{ .Values.wss.serverName }};
             ssl_certificate {{ .Values.wss.tls.mountPath }}/{{ .Values.wss.tls.certFile }};
             ssl_certificate_key {{ .Values.wss.tls.mountPath }}/{{ .Values.wss.tls.keyFile }};
@@ -45,12 +45,14 @@ data:
             location {{ .Values.wss.path }} {
                 {{- if $wssUpstreamHttps }}
                 proxy_pass https://kamailio_wss;
-                proxy_ssl_protocols TLSv1.2 TLSv1.3;
                 proxy_ssl_server_name on;
                 proxy_ssl_name {{ $wssSslName }};
                 proxy_ssl_verify {{ .Values.wss.upstream.sslVerify }};
+                proxy_ssl_session_reuse off;
+                proxy_redirect off;
                 {{- else }}
                 proxy_pass http://kamailio_wss;
+                proxy_redirect off;
                 {{- end }}
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade $http_upgrade;
