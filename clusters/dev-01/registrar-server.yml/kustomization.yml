@@ -9,7 +9,7 @@ kind: Kustomization
 
 resources:
   - ../../../applicationsets/generic-registrar-server.yml
-  - webrtc-gateway-secrets.yml
+  - registrar-server-secrets.yml
 
 patches:
   - target:
