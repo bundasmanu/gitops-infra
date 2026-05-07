@@ -1,0 +1,25 @@
+---
+
+name: registrar-server
+repoURL: https://github.com/bundasmanu/kamailio-registrar
+chartPath: k8s/helm/registrar-server
+
+namespace: kamailio
+
+# L4 edge: charts/nginx-sip-edge (see apps/nginx-sip-edge.yml). Kamailio Service is defined in the webrtc-gateway chart.
+chart_values:
+  replicaCount: 2
+
+  image:
+    repository: bundasmanu/registrar-server
+    tag: latest
+    pullPolicy: Always
+
+  hostNetwork: false
+
+  secrets:
+    existingSecret: registrar-server-secrets
+
+  volumeMounts:
+    - name: config
+      mountPath: /tmp/config

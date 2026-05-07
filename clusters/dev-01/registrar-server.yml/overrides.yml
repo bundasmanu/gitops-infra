@@ -1,0 +1,22 @@
+---
+
+# Must match environments/active-env.yml for this row to be selected.
+env: dev-01
+
+name-dest: in-cluster
+cluster: docker-desktop
+
+# Per-cluster Helm overrides (merged on top of apps/webrtc-gateway.yml chart_values)
+chart_values_overrides:
+
+  env:
+    CONFIGS_FOLDER: "/etc/kamailio"
+    CFGFILE: "router.cfg"
+    STARTER_KAM_USER: "kamailio"
+    STARTER_KAM_GROUP: "kamailio"
+    SHM_MEMORY: "2048"
+    PKG_MEMORY: "128"
+    RUNDIR: "/var/run/kamailio"
+
+    WITH_PROM_STATS: "true"
+    WITH_LOG_STDERR: "true"
