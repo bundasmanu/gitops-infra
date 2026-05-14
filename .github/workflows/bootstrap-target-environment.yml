@@ -70,18 +70,18 @@ jobs:
 
       - name: Argo CD
         run: |
-          set -e 
+          set -euo pipefail
           if kubectl get deployment argocd-server -n argocd >/dev/null 2>&1; then
             echo "Argo CD already installed."
             exit 0
           fi
+      
+          ARGOCD_VERSION=v2.11.3
+      
           kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
       
-          kubectl apply --server-side --force-conflicts -f \
-            https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/crds.yaml
-      
-          kubectl apply -n argocd -f \
-            https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+          kubectl apply --server-side --force-conflicts -n argocd -f \
+            https://raw.githubusercontent.com/argoproj/argo-cd/${ARGOCD_VERSION}/manifests/install.yaml
 
       - name: ApplicationSets
         env:
