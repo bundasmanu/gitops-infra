@@ -1,0 +1,17 @@
+---
+
+name: b2bua
+repoURL: https://github.com/bundasmanu/b2bua
+chartPath: k8s/helm/b2bua
+
+namespace: b2bua
+
+chart_values:
+  replicaCount: 3
+
+  image:
+    repository: bundasmanu/b2bua
+    tag: latest
+    pullPolicy: Always
+
+  hostNetwork: false
