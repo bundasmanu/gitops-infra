@@ -83,6 +83,13 @@ jobs:
           kubectl apply --server-side --force-conflicts -n argocd -f \
             https://raw.githubusercontent.com/argoproj/argo-cd/${ARGOCD_VERSION}/manifests/install.yaml
 
+      - name: Create namespaces
+        run: |
+          set -euo pipefail
+          for ns in b2bua kamailio; do
+            kubectl create namespace "${ns}" --dry-run=client -o yaml | kubectl apply -f -
+          done
+
       - name: ApplicationSets
         env:
           CLUSTER: ${{ inputs.cluster }}
