@@ -22,10 +22,10 @@ chart_values_overrides:
     recordingsDir: /etc/rtpengine/recordings
     logFilename: rtpengine
     listen:
-      externalIP: "188.80.27.108"
+      externalIP: "127.0.0.1"
       ngPort: 2223
       cliPort: 2224
       httpPort: 2226
     defaultInterface:
       minPort: 10000
-      maxPort: 20000
+      maxPort: 10004
