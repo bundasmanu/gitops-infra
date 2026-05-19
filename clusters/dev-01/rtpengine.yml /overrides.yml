@@ -10,5 +10,16 @@ cluster: docker-desktop
 chart_values_overrides:
 
   rtpengine:
+    user: rtpengine
+    confDir: /etc/rtpengine/conf
+    logDir: /etc/rtpengine/logs
+    recordingsDir: /etc/rtpengine/recordings
+    logFilename: rtpengine
     listen:
       externalIP: "188.80.27.108"
+      ngPort: 2223
+      cliPort: 2224
+      httpPort: 2226
+    defaultInterface:
+      minPort: 10000
+      maxPort: 20000
