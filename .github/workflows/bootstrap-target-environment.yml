@@ -2,7 +2,7 @@
 
 # Self-hosted runner: Linux or macOS (Docker Desktop / Colima / k3s, etc.).
 # Requires kubectl pointing at your cluster (~/.kube/config or runner env).
-# Order: cert-manager (CRDs) -> Argo CD -> ApplicationSets.
+# Order: cert-manager (CRDs) -> cluster storage -> Argo CD -> ApplicationSets.
 
 name: Install Argo CD and ApplicationSets
 
@@ -67,6 +67,24 @@ jobs:
           kubectl apply -f \
             "https://github.com/cert-manager/cert-manager/releases/download/${CERT_MANAGER_VERSION}/cert-manager.yaml"
           kubectl wait --for=condition=Available deployment --all -n cert-manager --timeout=300s
+
+      - name: Cluster storage
+        env:
+          CLUSTER: ${{ inputs.cluster }}
+        run: |
+          set -euo pipefail
+          STORAGE="clusters/${CLUSTER}/storage"
+          if [ ! -d "${STORAGE}" ]; then
+            echo "No storage overlay at ${STORAGE}; skipping."
+            exit 0
+          fi
+          if kubectl get storageclass local-path >/dev/null 2>&1; then
+            echo "StorageClass local-path already present."
+            exit 0
+          fi
+          kubectl kustomize --load-restrictor LoadRestrictionsNone "${STORAGE}" | kubectl apply -f -
+          kubectl wait --for=condition=Available deployment/local-path-provisioner \
+            -n local-path-storage --timeout=120s
 
       - name: Argo CD
         run: |

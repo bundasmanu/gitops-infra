@@ -6,8 +6,14 @@ env: dev-01
 name-dest: in-cluster
 cluster: docker-desktop
 
-# Per-cluster Helm overrides (merged on top of apps/webrtc-gateway.yml chart_values)
+# Per-cluster Helm overrides (merged on top of apps/rtpengine.yml chart_values).
+# persistence.storageClass requires clusters/<cluster>/storage (bootstrap workflow).
 chart_values_overrides:
+
+  persistence:
+    enabled: true
+    storageClass: local-path
+    size: 10Gi
 
   rtpengine:
     user: rtpengine
