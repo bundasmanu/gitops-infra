@@ -1,7 +1,7 @@
 ---
 
 name: rtpengine
-repoURL: https://github.com/bundasmanu/rtpengine
+repoURL: https://github.com/bundasmanu/rtpengine-docker
 chartPath: helm/rtpengine-docker
 
 namespace: rtpengine
