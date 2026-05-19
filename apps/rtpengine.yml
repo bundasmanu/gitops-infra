@@ -1,0 +1,14 @@
+---
+
+name: rtpengine
+repoURL: https://github.com/bundasmanu/rtpengine
+chartPath: helm/rtpengine-docker
+
+namespace: rtpengine
+
+# L4 edge: charts/nginx-sip-edge (see apps/nginx-sip-edge.yml). Kamailio Service is defined in the webrtc-gateway chart.
+chart_values:
+
+  statefulset:
+    name: rtpengine
+    replicas: 1
