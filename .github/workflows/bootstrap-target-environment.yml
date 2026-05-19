@@ -86,7 +86,7 @@ jobs:
       - name: Create namespaces
         run: |
           set -euo pipefail
-          for ns in b2bua kamailio; do
+          for ns in b2bua kamailio rtpengine; do
             kubectl create namespace "${ns}" --dry-run=client -o yaml | kubectl apply -f -
           done
 
