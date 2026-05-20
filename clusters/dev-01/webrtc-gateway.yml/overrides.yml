@@ -26,3 +26,4 @@ chart_values_overrides:
     DISPATCHER_DEFAULT_SOCKNAME: "lan-internal"
 
     WITH_TLS: "true"
+    WITH_RTPENGINE: "true"
